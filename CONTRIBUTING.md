@@ -4,8 +4,11 @@ Run the full local verification before submitting a change:
 
 ```console
 cargo fmt --all --check
+cargo fmt --manifest-path fuzz/Cargo.toml --check
 cargo test --all-targets --locked
+cargo test --doc --locked
 cargo clippy --all-targets --locked -- -D warnings
+cargo clippy --manifest-path fuzz/Cargo.toml --bins --locked -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --locked
 cargo check --manifest-path fuzz/Cargo.toml --bins --locked
 ```

@@ -30,17 +30,20 @@ separate milestone.
 ```rust
 use custos_cpe::{Component, Cpe, Part};
 
-let input =
-    "cpe:2.3:a:microsoft:internet_explorer:8.0.6001:beta:*:*:*:*:*:*";
-let cpe: Cpe = input.parse()?;
+fn main() -> Result<(), custos_cpe::ParseError> {
+    let input =
+        "cpe:2.3:a:microsoft:internet_explorer:8.0.6001:beta:*:*:*:*:*:*";
+    let cpe: Cpe = input.parse()?;
 
-assert_eq!(cpe.part(), &Component::Value(Part::Application));
-assert_eq!(
-    cpe.vendor().as_value().unwrap().to_literal_string().as_deref(),
-    Some("microsoft")
-);
-assert_eq!(cpe.to_string(), input);
-# Ok::<(), custos_cpe::ParseError>(())
+    assert_eq!(cpe.part(), &Component::Value(Part::Application));
+    assert_eq!(
+        cpe.vendor().as_value().unwrap().to_literal_string().as_deref(),
+        Some("microsoft")
+    );
+    assert_eq!(cpe.to_string(), input);
+
+    Ok(())
+}
 ```
 
 Parsing is deliberately strict:
@@ -55,23 +58,36 @@ Parsing is deliberately strict:
 
 “Permissive” describes the license, not parser behavior.
 
+The lowercase `cpe:2.3:` prefix and concrete part codes (`a`, `o`, and `h`)
+are a deliberate interoperability policy. RFC 5234 Section 2.3 makes ABNF
+string literals case-insensitive, so Figure 6-3 alone admits case variants.
+This crate instead accepts the lowercase prefix emitted by NIST IR 7695
+Section 6.2.2.2 and the lowercase part values required by Section 5.3.3.1.
+That keeps parsed input aligned with canonical output and avoids passing case
+variants to consumers that expect the established representation; it is an
+independently chosen strictness rule, not a claim that ABNF literals are
+inherently case-sensitive.
+
 ## Construction
 
 ```rust
 use custos_cpe::{Cpe, Part, ValueString};
 
-let name = Cpe::builder(Part::Application)
-    .vendor(ValueString::literal("example_corp")?)
-    .product(ValueString::literal("widget")?)
-    .version(ValueString::literal("1.0")?)
-    .build();
+fn main() -> Result<(), custos_cpe::ValueError> {
+    let name = Cpe::builder(Part::Application)
+        .vendor(ValueString::literal("example_corp")?)
+        .product(ValueString::literal("widget")?)
+        .version(ValueString::literal("1.0")?)
+        .build();
 
-assert_eq!(
-    name.to_string(),
-    "cpe:2.3:a:example_corp:widget:1.0:*:*:*:*:*:*:*"
-);
-assert!(ValueString::literal("example corp").is_err());
-# Ok::<(), custos_cpe::ValueError>(())
+    assert_eq!(
+        name.to_string(),
+        "cpe:2.3:a:example_corp:widget:1.0:*:*:*:*:*:*:*"
+    );
+    assert!(ValueString::literal("example corp").is_err());
+
+    Ok(())
+}
 ```
 
 CPE values cannot contain whitespace. Use the normalized value from the
@@ -93,6 +109,7 @@ limit appropriate to their environment before parsing.
 - [NIST IR 7695: CPE Naming Specification Version 2.3](https://doi.org/10.6028/NIST.IR.7695)
 - [NIST IR 7696: CPE Name Matching Specification Version 2.3](https://doi.org/10.6028/NIST.IR.7696)
 - [NIST CPE Naming resources](https://csrc.nist.gov/projects/security-content-automation-protocol/specifications/cpe/naming)
+- [RFC 5234: Augmented BNF for Syntax Specifications](https://www.rfc-editor.org/rfc/rfc5234)
 
 CPE is associated with the U.S. National Institute of Standards and
 Technology. This project is independent and is not endorsed by NIST.

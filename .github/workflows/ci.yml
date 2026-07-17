@@ -16,7 +16,7 @@ jobs:
       matrix:
         toolchain: [stable, 1.81.0]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - run: rustup toolchain install "${{ matrix.toolchain }}" --profile minimal
       - run: cargo "+${{ matrix.toolchain }}" test --all-targets --locked
       - run: cargo "+${{ matrix.toolchain }}" test --doc --locked
@@ -25,10 +25,12 @@ jobs:
     name: Formatting, Clippy, docs, and package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - run: rustup toolchain install stable --profile minimal --component clippy,rustfmt
       - run: cargo +stable fmt --all --check
+      - run: cargo +stable fmt --manifest-path fuzz/Cargo.toml --check
       - run: cargo +stable clippy --all-targets --locked -- -D warnings
+      - run: cargo +stable clippy --manifest-path fuzz/Cargo.toml --bins --locked -- -D warnings
       - run: RUSTDOCFLAGS="-D warnings" cargo +stable doc --no-deps --locked
       - run: cargo +stable check --manifest-path fuzz/Cargo.toml --bins --locked
       - run: cargo +stable package --locked
@@ -37,6 +39,6 @@ jobs:
     name: Rust 1.81 no_std + alloc
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - run: rustup toolchain install 1.81.0 --profile minimal --target thumbv7em-none-eabihf
       - run: cargo +1.81.0 check --lib --locked --target thumbv7em-none-eabihf

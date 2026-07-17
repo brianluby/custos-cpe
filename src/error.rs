@@ -58,7 +58,8 @@ pub enum ParseErrorKind {
         /// The rejected character.
         character: char,
     },
-    /// A backslash does not quote a character allowed by the grammar.
+    /// A backslash is dangling or does not quote a character allowed by the
+    /// grammar; escape-aware field splitting can report this for any attribute.
     InvalidEscape,
     /// An unquoted wildcard is not in a permitted edge position.
     InvalidWildcardPlacement,

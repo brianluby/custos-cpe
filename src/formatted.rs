@@ -75,14 +75,6 @@ impl FromStr for Cpe {
     }
 }
 
-impl TryFrom<&str> for Cpe {
-    type Error = ParseError;
-
-    fn try_from(input: &str) -> Result<Self, Self::Error> {
-        Self::parse_formatted(input)
-    }
-}
-
 fn split_fields(input: &str, base_offset: usize) -> Result<[Field<'_>; FIELD_COUNT], ParseError> {
     let bytes = input.as_bytes();
     let empty = Field {
@@ -198,6 +190,8 @@ fn parse_value(
                         }
                         ValueErrorKind::Empty => ParseErrorKind::EmptyValue,
                         ValueErrorKind::AmbiguousLogicalValue => {
+                            // INVARIANT: `*` and `-` are consumed above, so
+                            // `parse_at` cannot produce this error on this path.
                             ParseErrorKind::InvalidWildcardPlacement
                         }
                     },

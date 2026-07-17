@@ -260,6 +260,16 @@ mod escaping_and_wildcards {
     }
 
     #[test]
+    fn wfn_string_escapes_hyphen_and_period_that_formatted_display_leaves_unquoted() {
+        let value = ValueString::literal("release-1.0").expect("literal is representable");
+
+        assert_eq!(
+            (value.to_string(), value.to_wfn_string()),
+            ("release-1.0".to_owned(), r"release\-1\.0".to_owned())
+        );
+    }
+
+    #[test]
     fn escaped_and_unescaped_specials_have_distinct_atoms() {
         let literal = ValueString::parse_formatted(r"\*word\?")
             .expect("quoted special characters are literals");
@@ -389,6 +399,16 @@ mod part_and_language_grammar {
             ("en-US", "en-US".to_owned())
         );
     }
+
+    #[test]
+    fn language_tag_constructor_reports_invalid_input_directly() {
+        let error = LanguageTag::new("e").expect_err("one-letter language is invalid");
+
+        assert_eq!(
+            (error.span().start(), error.span().end(), error.to_string(),),
+            (0, 1, "invalid CPE language tag at bytes 0..1".to_owned())
+        );
+    }
 }
 
 mod malformed_formatted_strings {
@@ -446,6 +466,9 @@ mod malformed_formatted_strings {
 
     #[test]
     fn noncanonical_prefixes_are_rejected() {
+        // Figure 6-3's ABNF literals are case-insensitive under RFC 5234
+        // Section 2.3. This crate deliberately accepts only the lowercase
+        // binding emitted by NISTIR 7695 Section 6.2.2.2; see the README.
         for input in [
             "cpe:/a:microsoft:internet_explorer:8.0.6001:beta",
             "CPE:2.3:a:*:*:*:*:*:*:*:*:*:*",
@@ -577,6 +600,77 @@ mod byte_spans {
     }
 }
 
+mod error_messages {
+    use super::*;
+
+    #[test]
+    fn parse_error_display_covers_every_current_kind() {
+        let cases = [
+            (
+                "CPE:2.3:a:*:*:*:*:*:*:*:*:*:*",
+                "invalid CPE 2.3 prefix at byte 0",
+            ),
+            ("cpe:2.3:*", "expected 11 CPE attribute fields, found 1"),
+            (
+                "cpe:2.3:a:*::*:*:*:*:*:*:*:*",
+                "empty value for product at bytes 12..12",
+            ),
+            (
+                "cpe:2.3:x:*:*:*:*:*:*:*:*:*:*",
+                "invalid part for part at bytes 8..9",
+            ),
+            (
+                "cpe:2.3:a:*:*:*:*:*:e:*:*:*:*",
+                "invalid language for language at bytes 20..21",
+            ),
+            (
+                "cpe:2.3:a:$:*:*:*:*:*:*:*:*:*",
+                "invalid character '$' for vendor at bytes 10..11",
+            ),
+            (
+                "cpe:2.3:a:foo*bar:*:*:*:*:*:*:*:*:*",
+                "invalid wildcard placement for vendor at bytes 13..14",
+            ),
+            (
+                "cpe:2.3:*:*:*:*:*:*:*:*:*:*:*:\\",
+                "invalid escape at bytes 30..31",
+            ),
+        ];
+
+        for (input, expected) in cases {
+            let error = input.parse::<Cpe>().expect_err("input must be rejected");
+            assert_eq!(
+                error.to_string(),
+                expected,
+                "unexpected message for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn value_error_display_covers_every_current_kind() {
+        let errors = [
+            ValueString::literal("").expect_err("empty value is invalid"),
+            ValueString::literal("-").expect_err("lone hyphen conflicts with logical NA"),
+            ValueString::parse_formatted("$")
+                .expect_err("unescaped dollar is invalid formatted syntax"),
+            ValueString::parse_formatted(r"\a").expect_err("escape target is invalid"),
+            ValueString::parse_formatted("foo*bar").expect_err("embedded wildcard is invalid"),
+        ];
+        let expected = [
+            "empty CPE value at bytes 0..0",
+            "value conflicts with a logical value at bytes 0..1",
+            "invalid character '$' in CPE value at bytes 0..1",
+            "invalid escape in CPE value at bytes 0..2",
+            "invalid wildcard placement in CPE value at bytes 3..4",
+        ];
+
+        for (error, expected) in errors.iter().zip(expected) {
+            assert_eq!(error.to_string(), expected);
+        }
+    }
+}
+
 mod builder_round_trips {
     use super::*;
 
@@ -585,6 +679,13 @@ mod builder_round_trips {
         let built = Cpe::builder(Part::Application).build();
 
         assert_eq!(built.to_string(), "cpe:2.3:a:*:*:*:*:*:*:*:*:*:*");
+    }
+
+    #[test]
+    fn default_cpe_sets_every_attribute_to_any() {
+        let default = Cpe::default();
+
+        assert_eq!(default.to_string(), "cpe:2.3:*:*:*:*:*:*:*:*:*:*:*");
     }
 
     #[test]

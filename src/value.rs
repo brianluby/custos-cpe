@@ -435,9 +435,9 @@ const fn is_quotable(byte: u8) -> bool {
 }
 
 fn next_character_end(input: &str, offset: usize) -> usize {
-    input[offset..]
-        .chars()
-        .next()
+    input
+        .get(offset..)
+        .and_then(|suffix| suffix.chars().next())
         .map_or(offset, |character| offset + character.len_utf8())
 }
 
