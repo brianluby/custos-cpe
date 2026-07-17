@@ -1,0 +1,30 @@
+[package]
+name = "custos-cpe-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+custos-cpe = { path = ".." }
+libfuzzer-sys = "0.4"
+
+[[bin]]
+name = "parse_formatted_utf8"
+path = "fuzz_targets/parse_formatted_utf8.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "formatted_round_trip"
+path = "fuzz_targets/formatted_round_trip.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]
+members = ["."]
+resolver = "2"

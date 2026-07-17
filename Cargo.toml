@@ -1,0 +1,30 @@
+[package]
+name = "custos-cpe"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.81"
+description = "A strict, clean-room CPE 2.3 parser and formatter"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/brianluby/custos-cpe"
+documentation = "https://docs.rs/custos-cpe"
+readme = "README.md"
+keywords = ["cpe", "scap", "security", "vulnerability"]
+categories = ["parser-implementations", "no-std"]
+include = [
+    "src/**",
+    "tests/**",
+    "docs/clean-room.md",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE-APACHE",
+    "LICENSE-MIT",
+]
+
+[dependencies]
+
+[lints.rust]
+missing_docs = "deny"
+unsafe_code = "forbid"
+
+[lints.rustdoc]
+broken_intra_doc_links = "deny"
