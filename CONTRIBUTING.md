@@ -11,6 +11,7 @@ cargo clippy --all-targets --locked -- -D warnings
 cargo clippy --manifest-path fuzz/Cargo.toml --bins --locked -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --locked
 cargo check --manifest-path fuzz/Cargo.toml --bins --locked
+cargo +stable package --locked
 ```
 
 Run a parser or round-trip fuzz campaign with `cargo-fuzz` installed:
