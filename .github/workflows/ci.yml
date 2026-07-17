@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test Rust ${{ matrix.toolchain }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain: [stable, 1.81.0]
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install "${{ matrix.toolchain }}" --profile minimal
+      - run: cargo "+${{ matrix.toolchain }}" test --all-targets --locked
+      - run: cargo "+${{ matrix.toolchain }}" test --doc --locked
+
+  quality:
+    name: Formatting, Clippy, docs, and package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install stable --profile minimal --component clippy,rustfmt
+      - run: cargo +stable fmt --all --check
+      - run: cargo +stable clippy --all-targets --locked -- -D warnings
+      - run: RUSTDOCFLAGS="-D warnings" cargo +stable doc --no-deps --locked
+      - run: cargo +stable check --manifest-path fuzz/Cargo.toml --bins --locked
+      - run: cargo +stable package --locked
+
+  no-std:
+    name: Rust 1.81 no_std + alloc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install 1.81.0 --profile minimal --target thumbv7em-none-eabihf
+      - run: cargo +1.81.0 check --lib --locked --target thumbv7em-none-eabihf
