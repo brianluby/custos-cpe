@@ -5,6 +5,7 @@ edition = "2021"
 rust-version = "1.81"
 description = "A strict, clean-room CPE 2.3 parser and formatter"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/brianluby/custos-cpe"
 documentation = "https://docs.rs/custos-cpe"
 readme = "README.md"
 keywords = ["cpe", "scap", "security", "vulnerability"]
