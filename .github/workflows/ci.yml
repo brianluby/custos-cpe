@@ -16,7 +16,7 @@ jobs:
       matrix:
         toolchain: [stable, 1.81.0]
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         with:
           persist-credentials: false
       - run: rustup toolchain install "${{ matrix.toolchain }}" --profile minimal
@@ -27,7 +27,7 @@ jobs:
     name: Formatting, Clippy, docs, and package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         with:
           persist-credentials: false
       - run: rustup toolchain install stable --profile minimal --component clippy,rustfmt
@@ -48,7 +48,7 @@ jobs:
       FUZZ_TIME_SECONDS: "30"
       NIGHTLY_TOOLCHAIN: nightly-2026-07-16
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         with:
           persist-credentials: false
       - run: rustup toolchain install "$NIGHTLY_TOOLCHAIN" --profile minimal --component rust-src
@@ -71,7 +71,7 @@ jobs:
     name: Rust 1.81 no_std + alloc
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         with:
           persist-credentials: false
       - run: rustup toolchain install 1.81.0 --profile minimal --target thumbv7em-none-eabihf
