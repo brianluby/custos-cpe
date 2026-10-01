@@ -116,7 +116,8 @@ Technology. This project is independent and is not endorsed by NIST.
 
 ## MSRV
 
-The minimum supported Rust version is 1.81.0.
+The minimum supported Rust version is 1.94.0. It matches Custos and is raised
+together with it.
 
 ## License
 

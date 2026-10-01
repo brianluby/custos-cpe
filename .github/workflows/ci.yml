@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        toolchain: [stable, 1.81.0]
+        toolchain: [stable, 1.94.0]
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
@@ -68,11 +68,11 @@ jobs:
           git diff --exit-code -- fuzz/Cargo.lock fuzz/seeds
 
   no-std:
-    name: Rust 1.81 no_std + alloc
+    name: Rust 1.94 no_std + alloc
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           persist-credentials: false
-      - run: rustup toolchain install 1.81.0 --profile minimal --target thumbv7em-none-eabihf
-      - run: cargo +1.81.0 check --lib --locked --target thumbv7em-none-eabihf
+      - run: rustup toolchain install 1.94.0 --profile minimal --target thumbv7em-none-eabihf
+      - run: cargo +1.94.0 check --lib --locked --target thumbv7em-none-eabihf
