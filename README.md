@@ -8,6 +8,14 @@ The implementation is derived from the public NIST specifications. It does
 not contain or translate source code from `scap-rs` or another CPE
 implementation.
 
+## Project status
+
+Frozen at its current scope (Custos ADR 0011, 2026-10-01). Custos uses a
+single CPE implementation, the one `custos-dedup` exposes (currently the
+`cpe` crate). Work here resumes only if `cpe` becomes unmaintained or blocks
+a CPE 2.3 case Custos needs, and then starts with the legacy `cpe:/` URI
+binding that `custos-dedup` relies on.
+
 ## Current scope
 
 | Capability | Status |
