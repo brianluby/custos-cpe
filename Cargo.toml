@@ -2,7 +2,7 @@
 name = "custos-cpe"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.81"
+rust-version = "1.94"
 description = "A strict, clean-room CPE 2.3 parser and formatter"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/brianluby/custos-cpe"
